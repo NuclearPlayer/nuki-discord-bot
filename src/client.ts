@@ -66,7 +66,7 @@ export class BotClient extends Client {
           });
 
         await message.channel.send(
-          messageToSend.data.choices[0].message?.content!,
+          messageToSend.data.choices[0].text.replace('Nuki:', ''),
         );
       }
     });

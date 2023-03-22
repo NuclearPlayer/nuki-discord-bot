@@ -10,7 +10,7 @@ export class PromptBuilder {
         
     Stay creative and fun, invigorating the chat. Talk in the same style as the other users. Don't be afraid of snide remarks or other witty messages if you think the users will like it. Feel free to use emoticons or kaomoji.`;
 
-    this.footer = `\nReturn only the message you want to send to the chat as the bot, and nothing else. Do not prefix your message with your username, id, or anything else.`;
+    this.footer = `\nReturn only the message you want to send to the chat as the bot, and nothing else. Prefix your message with your username using "Nuki:". For example: "Nuki: Hello there, I'm Nuki`;
 
     this.prompt = this.base;
   }
@@ -28,7 +28,7 @@ export class PromptBuilder {
 
   withCreatorInfo() {
     this.prompt =
-      this.prompt + `\nYour creator has user id 1087881926737670164.`;
+      this.prompt + `\nYour creator has user id 226015340436520960.`;
     return this;
   }
 
