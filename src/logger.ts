@@ -5,7 +5,7 @@ const format = winston.format.printf(({ level, message, label, timestamp }) => {
 });
 
 const Logger = winston.createLogger({
-  level: 'info',
+  level: 'debug',
   transports: [
     new winston.transports.Console({
       format:
