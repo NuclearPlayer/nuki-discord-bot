@@ -34,6 +34,7 @@ export class BotClient extends Client {
         (chance <= 25 || (this.user && message.mentions.has(this.user))) &&
         message.author.id !== this.user?.id
       ) {
+        await message.channel.sendTyping();
         const openAiService = new OpenAiApiService();
         const availableEmoji = message.guild?.emojis.cache.map((emoji) => ({
           id: emoji.id,
