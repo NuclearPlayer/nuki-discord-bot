@@ -48,10 +48,16 @@ export class BotClient extends Client {
           await message.channel.messages.fetch({ limit: 10 })
         )
           // @ts-ignore
-          .map((message: Message) => ({
-            role: message.author.id === this.user?.id ? 'assistant' : 'user',
-            content: `${message.author.username}[id:${message.author.id}]: ${message.content}`,
-          }))
+          .map((message: Message) => {
+            const serverNickname = message.author.tag.replace(
+              `#${message.author.discriminator}`,
+              '',
+            );
+            return {
+              role: message.author.id === this.user?.id ? 'assistant' : 'user',
+              content: `${serverNickname}[id:${message.author.id}]: ${message.content}`,
+            };
+          })
           .reverse();
 
         Logger.info('Querying OpenAI API...');
