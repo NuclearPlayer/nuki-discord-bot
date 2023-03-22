@@ -1,0 +1,13 @@
+{
+    "tabWidth": 2,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true,
+    "importOrder": [
+        "^@?(.*)$",
+        "<THIRD_PARTY_MODULES>",
+        "^[./]",
+        "^[../]"
+    ]
+}
