@@ -30,7 +30,10 @@ export class BotClient extends Client {
     this.on('messageCreate', async (message) => {
       const chance = random(0, 100);
 
-      if (chance <= 25 && message.author.id !== this.user?.id) {
+      if (
+        (chance <= 25 || (this.user && message.mentions.has(this.user))) &&
+        message.author.id !== this.user?.id
+      ) {
         const openAiService = new OpenAiApiService();
         const availableEmoji = message.guild?.emojis.cache.map((emoji) => ({
           id: emoji.id,
