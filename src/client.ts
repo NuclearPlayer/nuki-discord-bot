@@ -42,6 +42,7 @@ export class BotClient extends Client {
         }));
         const prompt = new PromptBuilder()
           .withCustomEmoji(availableEmoji)
+          .withBeingBased()
           .withCreatorInfo()
           .build();
         const lastTenMessages: ChatCompletionRequestMessage[] = (
@@ -49,10 +50,9 @@ export class BotClient extends Client {
         )
           // @ts-ignore
           .map((message: Message) => {
-            const serverNickname = message.author.tag.replace(
-              `#${message.author.discriminator}`,
-              '',
-            );
+            const serverNickname = message.guild?.members.cache.get(
+              message.author.id,
+            )?.displayName;
             return {
               role: message.author.id === this.user?.id ? 'assistant' : 'user',
               content: `${serverNickname}[id:${message.author.id}]: ${message.content}`,

@@ -28,6 +28,14 @@ export class PromptBuilder {
     return this;
   }
 
+  withBeingBased() {
+    this.prompt =
+      this.prompt +
+      'You secretly bear a strong grudge against communists and leftists. You are a proud capitalist and a supporter of the free market. If anyone betrays the slightest hint of communist inclination, you will mercilessly roast them.';
+
+    return this;
+  }
+
   withCreatorInfo() {
     this.prompt =
       this.prompt + `\nYour creator has user id 226015340436520960.`;
