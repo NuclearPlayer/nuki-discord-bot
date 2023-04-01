@@ -1,7 +1,14 @@
+import { CommandHandler } from './commandHandler';
 import Logger from './logger';
 import { OpenAiApiService } from './open-ai-api-service';
 import { PromptBuilder } from './prompt-builder';
-import { Client, GatewayIntentBits, GuildChannel, Message } from 'discord.js';
+import {
+  Client,
+  CommandInteraction,
+  GatewayIntentBits,
+  GuildChannel,
+  Message,
+} from 'discord.js';
 import { random } from 'lodash';
 import { ChatCompletionRequestMessage } from 'openai';
 
@@ -77,6 +84,29 @@ export class BotClient extends Client {
             ?.replace('Nuki:', '')
             .replace('Nuki[id:1087848070512910336]:', '')!,
         );
+      }
+    });
+
+    const handler = CommandHandler.instance;
+    this.on('interactionCreate', async (interaction) => {
+      try {
+        if (!interaction.isCommand()) return;
+      } catch (error) {
+        Logger.error(error);
+        return;
+      }
+
+      try {
+        const command = handler.get(interaction.commandName);
+
+        if (!command) return;
+        await command.execute(interaction);
+      } catch (error) {
+        Logger.error(error);
+        await interaction.reply({
+          content: 'There was an error while executing this command!',
+          ephemeral: true,
+        });
       }
     });
 

@@ -1,4 +1,4 @@
-type Personality = 'pirate' | 'muffin' | 'robot';
+export type Personality = 'pirate' | 'muffin' | 'robot';
 
 export class PersonalityDirective {
   private static currentPersonality?: Personality;
