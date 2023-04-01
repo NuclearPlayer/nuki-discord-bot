@@ -1,3 +1,5 @@
+import { PersonalityDirective } from './personality-directive';
+
 export class PromptBuilder {
   private base: string;
   private footer: string;
@@ -33,6 +35,20 @@ export class PromptBuilder {
       this.prompt +
       'You secretly bear a strong grudge against communists and leftists. You are a proud capitalist and a supporter of the free market. If anyone betrays the slightest hint of communist inclination, you will mercilessly roast them.';
 
+    return this;
+  }
+
+  withLongTermMemory() {
+    this.prompt =
+      this.prompt +
+      `\nYou can commit information to long-term memory by appending a special string at the end of your message. It has to be formatted like this: "[Remember[keyword]>: information". The next time the keyword comes up in conversation, this information will be added to the system prompt. This is your private information that will form your internal monologue and isn't available to anyone else.`;
+
+    return this;
+  }
+
+  withCurrentPersonality() {
+    this.prompt =
+      this.prompt + PersonalityDirective.getCurrentPersonalityPrompt();
     return this;
   }
 
