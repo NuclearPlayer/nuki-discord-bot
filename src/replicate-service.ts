@@ -1,3 +1,4 @@
+import Logger from './logger';
 import Replicate from 'replicate';
 
 export class ReplicateService {
@@ -36,6 +37,7 @@ export class ReplicateService {
     )) as unknown as string;
 
     this.captionCache.set(image, result);
+    Logger.debug(result);
     return result;
   }
 }

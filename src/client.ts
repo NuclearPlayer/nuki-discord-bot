@@ -79,8 +79,6 @@ export class BotClient extends Client {
         ).reverse();
 
         Logger.info('Querying OpenAI API...');
-        Logger.debug(`System prompt: ${JSON.stringify(prompt)}`);
-        Logger.debug(`Last messages: ${JSON.stringify(lastTenMessages)}`);
         const messageToSend = await openAiService
           .getClient()
           .createChatCompletion({
