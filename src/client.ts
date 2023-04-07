@@ -2,14 +2,9 @@ import { CommandHandler } from './commandHandler';
 import Logger from './logger';
 import { OpenAiApiService } from './open-ai-api-service';
 import { PromptBuilder } from './prompt-builder';
-import {
-  Client,
-  CommandInteraction,
-  GatewayIntentBits,
-  GuildChannel,
-  Message,
-} from 'discord.js';
-import { random } from 'lodash';
+import { ReplicateService } from './replicate-service';
+import { Client, GatewayIntentBits, Message } from 'discord.js';
+import { isEmpty, random } from 'lodash';
 import { ChatCompletionRequestMessage } from 'openai';
 
 export class BotClient extends Client {
@@ -54,19 +49,34 @@ export class BotClient extends Client {
           .withCreatorInfo()
           .build();
         const lastTenMessages: ChatCompletionRequestMessage[] = (
-          await message.channel.messages.fetch({ limit: 10 })
-        )
-          // @ts-ignore
-          .map((message: Message) => {
-            const serverNickname = message.guild?.members.cache.get(
-              message.author.id,
-            )?.displayName;
-            return {
-              role: message.author.id === this.user?.id ? 'assistant' : 'user',
-              content: `${serverNickname}[id:${message.author.id}]: ${message.content}`,
-            };
-          })
-          .reverse();
+          await Promise.all(
+            (
+              await message.channel.messages.fetch({ limit: 10 })
+            )
+              // @ts-ignore
+              .map(async (message: Message) => {
+                const serverNickname = message.guild?.members.cache.get(
+                  message.author.id,
+                )?.displayName;
+
+                const image = message.attachments.first()?.url;
+                let imageCaption = '';
+
+                if (image) {
+                  imageCaption =
+                    await ReplicateService.getInstance().getCaption(image);
+                }
+
+                return {
+                  role:
+                    message.author.id === this.user?.id ? 'assistant' : 'user',
+                  content: `${serverNickname}[id:${message.author.id}]: ${
+                    !isEmpty(imageCaption) ? `[image ${imageCaption}]` : ''
+                  } ${message.content}`,
+                };
+              }),
+          )
+        ).reverse();
 
         Logger.info('Querying OpenAI API...');
         Logger.debug(`System prompt: ${JSON.stringify(prompt)}`);
