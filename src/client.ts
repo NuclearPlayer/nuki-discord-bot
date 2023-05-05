@@ -70,7 +70,11 @@ export class BotClient extends Client {
                 return {
                   role:
                     message.author.id === this.user?.id ? 'assistant' : 'user',
-                  content: `${serverNickname}[id:${message.author.id}]: ${
+                  content: `[${new Date(
+                    message.createdTimestamp,
+                  ).toLocaleString()}] ${serverNickname}[id:${
+                    message.author.id
+                  }]: ${
                     !isEmpty(imageCaption) ? `[image ${imageCaption}]` : ''
                   } ${message.content}`,
                 };
