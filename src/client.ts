@@ -94,7 +94,14 @@ export class BotClient extends Client {
         await message.channel.send(
           messageToSend.data.choices[0].message?.content
             ?.replace('Nuki:', '')
-            .replace('Nuki[id:1087848070512910336]:', '')!,
+            .replace('Nuki[id:1087848070512910336]:', '')
+            .replace(
+              new RegExp(
+                `\\[\\d{1,2}\\/\\d{1,2}\\/\\d{4}, \\d{1,2}:\\d{1,2}:\\d{1,2} [AP]M\\] ?`,
+                'g',
+              ),
+              '',
+            )!,
         );
       }
     });
