@@ -33,7 +33,7 @@ export class BotClient extends Client {
       const chance = random(0, 100);
 
       if (
-        (chance <= 25 || (this.user && message.mentions.has(this.user))) &&
+        (chance <= 10 || (this.user && message.mentions.has(this.user))) &&
         message.author.id !== this.user?.id
       ) {
         await message.channel.sendTyping();
