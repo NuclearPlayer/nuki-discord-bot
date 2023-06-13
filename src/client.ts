@@ -87,7 +87,7 @@ export class BotClient extends Client {
           .getClient()
           .createChatCompletion({
             max_tokens: 256,
-            model: 'gpt-3.5-turbo-0301',
+            model: 'gpt-3.5-turbo-0613',
             messages: [{ role: 'system', content: prompt }, ...lastTenMessages],
           });
 
