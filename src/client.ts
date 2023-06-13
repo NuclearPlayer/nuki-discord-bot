@@ -45,7 +45,6 @@ export class BotClient extends Client {
         const prompt = new PromptBuilder()
           .withCustomEmoji(availableEmoji)
           .withCurrentPersonality()
-          .withBeingBased()
           .withCreatorInfo()
           .build();
         const lastTenMessages: ChatCompletionRequestMessage[] = (
