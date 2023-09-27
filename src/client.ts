@@ -33,7 +33,7 @@ export class BotClient extends Client {
       const chance = random(0, 100);
 
       if (
-        (chance <= 10 || (this.user && message.mentions.has(this.user))) &&
+        (chance <= 6 || (this.user && message.mentions.has(this.user))) &&
         message.author.id !== this.user?.id
       ) {
         await message.channel.sendTyping();
@@ -86,7 +86,7 @@ export class BotClient extends Client {
           .getClient()
           .createChatCompletion({
             max_tokens: 256,
-            model: 'gpt-3.5-turbo-0613',
+            model: 'gpt-3.5-turbo',
             messages: [{ role: 'system', content: prompt }, ...lastTenMessages],
           });
 
