@@ -72,7 +72,15 @@ export class BotClient extends Client {
                     message.author.id
                   }]: ${message.content}`;
 
-                  if (image) {
+                  if (
+                    image &&
+                    (image.endsWith('.gif') ||
+                      image.endsWith('.png') ||
+                      image.endsWith('.jpg') ||
+                      image.endsWith('.jpeg')
+                      image.endsWith('.webp')
+                      )
+                  ) {
                     content = [
                       {
                         type: 'text',
