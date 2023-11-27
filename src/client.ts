@@ -73,13 +73,11 @@ export class BotClient extends Client {
                   }]: ${message.content}`;
 
                   if (
-                    image &&
-                    (image.endsWith('.gif') ||
-                      image.endsWith('.png') ||
-                      image.endsWith('.jpg') ||
-                      image.endsWith('.jpeg')
-                      image.endsWith('.webp')
-                      )
+                    (image && image?.endsWith('.gif')) ||
+                    image?.endsWith('.png') ||
+                    image?.endsWith('.jpg') ||
+                    image?.endsWith('.jpeg') ||
+                    image?.endsWith('.webp')
                   ) {
                     content = [
                       {
