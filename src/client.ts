@@ -5,7 +5,12 @@ import { PromptBuilder } from './prompt-builder';
 import { ReplicateService } from './replicate-service';
 import { Client, GatewayIntentBits, Message } from 'discord.js';
 import { isEmpty, random } from 'lodash';
-import { ChatCompletionRequestMessage } from 'openai';
+import { OpenAI } from 'openai';
+import {
+  ChatCompletionContentPart,
+  ChatCompletionContentPartImage,
+  ChatCompletionUserMessageParam,
+} from 'openai/resources';
 
 export class BotClient extends Client {
   constructor() {
@@ -47,51 +52,64 @@ export class BotClient extends Client {
           .withCurrentPersonality()
           .withCreatorInfo()
           .build();
-        const lastTenMessages: ChatCompletionRequestMessage[] = (
-          await Promise.all(
-            (
-              await message.channel.messages.fetch({ limit: 10 })
-            )
-              // @ts-ignore
-              .map(async (message: Message) => {
-                const serverNickname = message.guild?.members.cache.get(
-                  message.author.id,
-                )?.displayName;
+        const lastTenMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
+          (
+            await Promise.all(
+              (
+                await message.channel.messages.fetch({ limit: 10 })
+              )
+                // @ts-ignore
+                .map(async (message: Message) => {
+                  const serverNickname = message.guild?.members.cache.get(
+                    message.author.id,
+                  )?.displayName;
 
-                const image = message.attachments.first()?.url;
-                let imageCaption = '';
+                  const image = message.attachments.first()?.url;
 
-                if (image) {
-                  imageCaption =
-                    await ReplicateService.getInstance().getCaption(image);
-                }
-
-                return {
-                  role:
-                    message.author.id === this.user?.id ? 'assistant' : 'user',
-                  content: `[${new Date(
+                  let content: ChatCompletionUserMessageParam['content'] = `[${new Date(
                     message.createdTimestamp,
                   ).toLocaleString()}] ${serverNickname}[id:${
                     message.author.id
-                  }]: ${
-                    !isEmpty(imageCaption) ? `[image ${imageCaption}]` : ''
-                  } ${message.content}`,
-                };
-              }),
-          )
-        ).reverse();
+                  }]: ${message.content}`;
+
+                  if (image) {
+                    content = [
+                      {
+                        type: 'text',
+                        text: content,
+                      },
+                      {
+                        type: 'image_url',
+                        image_url: {
+                          detail: 'low',
+                          url: image,
+                        },
+                      },
+                    ];
+                  }
+
+                  return {
+                    role:
+                      message.author.id === this.user?.id
+                        ? 'assistant'
+                        : 'user',
+                    content,
+                  };
+                }),
+            )
+          ).reverse();
 
         Logger.info('Querying OpenAI API...');
         const messageToSend = await openAiService
           .getClient()
-          .createChatCompletion({
+          .chat.completions.create({
             max_tokens: 256,
-            model: 'gpt-4-1106-preview',
+            model: 'gpt-4-vision-preview',
             messages: [{ role: 'system', content: prompt }, ...lastTenMessages],
           });
 
         await message.channel.send(
-          messageToSend.data.choices[0].message?.content
+          messageToSend.choices[0].message?.content
             ?.replace('Nuki:', '')
             .replace('Nuki[id:1087848070512910336]:', '')
             .replace(

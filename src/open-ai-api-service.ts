@@ -1,13 +1,12 @@
-import { Configuration, OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 
 export class OpenAiApiService {
-  private client: OpenAIApi;
+  private client: OpenAI;
 
   constructor() {
-    const configuration = new Configuration({
+    this.client = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
-    this.client = new OpenAIApi(configuration);
   }
 
   getClient() {
