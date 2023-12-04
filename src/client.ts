@@ -48,9 +48,10 @@ export class BotClient extends Client {
           name: emoji.name ?? '',
         }));
         const prompt = new PromptBuilder()
-          .withCustomEmoji(availableEmoji)
           .withCurrentPersonality()
           .withCreatorInfo()
+          .withNuclearInfo()
+          .withCustomEmoji(availableEmoji)
           .build();
         const lastTenMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
           (
