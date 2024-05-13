@@ -111,7 +111,7 @@ export class BotClient extends Client {
           .getClient()
           .chat.completions.create({
             max_tokens: 256,
-            model: 'gpt-4-vision-preview',
+            model: 'gpt-4o',
             messages: [{ role: 'system', content: prompt }, ...lastTenMessages],
           });
 
