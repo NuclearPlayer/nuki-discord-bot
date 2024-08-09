@@ -74,6 +74,10 @@ export class PromptBuilder {
     return this;
   }
 
+  withModerator() {
+    this.prompt = this.prompt + `\nYou are a moderator of the server. Based on each message you see either return nothing, or use the moderation function to decide whether to delete the message, ban the user, or do something else.`;
+  }
+
   build() {
     return this.prompt + this.footer;
   }
