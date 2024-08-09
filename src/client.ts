@@ -1,11 +1,13 @@
 import { CommandHandler } from './commandHandler';
 import Logger from './logger';
 import { OpenAiApiService } from './open-ai-api-service';
+import { createAssistantMessage, createUserMessage } from './open-ai-tools';
 import { PromptBuilder } from './prompt-builder';
 import { Client, GatewayIntentBits, Message } from 'discord.js';
 import { random } from 'lodash';
 import { OpenAI } from 'openai';
 import {
+  ChatCompletionContentPart,
   ChatCompletionUserMessageParam,
 } from 'openai/resources';
 
@@ -50,25 +52,34 @@ export class BotClient extends Client {
           .withNuclearInfo()
           .withCustomEmoji(availableEmoji)
           .build();
-        const lastTenMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
+        const lastMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
           (
             await Promise.all(
               (
-                await message.channel.messages.fetch({ limit: 10 })
+                await message.channel.messages.fetch({ limit: 30 })
               )
-                // @ts-ignore
                 .map(async (message: Message) => {
+                  const isNukisMessage = message.author.id === this.user?.id;
+
+                  if(isNukisMessage) {
+                    return createAssistantMessage({
+                      content: [{
+                        type: 'text',
+                        text: `[${new Date(message.createdTimestamp).toLocaleString()}]: ${message.content}`
+                      }]
+                    })
+                  }
+
                   const serverNickname = message.guild?.members.cache.get(
                     message.author.id,
                   )?.displayName;
 
                   const image = message.attachments.first()?.url;
 
-                  let content: ChatCompletionUserMessageParam['content'] = `[${new Date(
-                    message.createdTimestamp,
-                  ).toLocaleString()}] ${serverNickname}[id:${
-                    message.author.id
-                  }]: ${message.content}`;
+                  let content: ChatCompletionContentPart[] = [{
+                    type: 'text', 
+                    text: `[${new Date(message.createdTimestamp).toLocaleString()}]: ${message.content}`
+                  }];
 
                   if (
                     (image && image?.endsWith('.gif')) ||
@@ -89,16 +100,13 @@ export class BotClient extends Client {
                           url: image,
                         },
                       },
-                    ];
-                  }
+                    ] as ChatCompletionContentPart[];
+                  }                
 
-                  return {
-                    role:
-                      message.author.id === this.user?.id
-                        ? 'assistant'
-                        : 'user',
+                  return createUserMessage({
                     content,
-                  };
+                    name: `${serverNickname}[id:${message.author.id}]`,
+                  });
                 }),
             )
           ).reverse();
@@ -109,7 +117,7 @@ export class BotClient extends Client {
           .chat.completions.create({
             max_tokens: 256,
             model: 'gpt-4o',
-            messages: [{ role: 'system', content: prompt }, ...lastTenMessages],
+            messages: [{ role: 'system', content: prompt }, ...lastMessages],
           });
 
         await message.channel.send(
