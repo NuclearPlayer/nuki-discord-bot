@@ -24,10 +24,12 @@ export const chatbot = {
         name: emoji.name ?? '',
       }));
       const prompt = new PromptBuilder()
+        .withChatbotPrompt()
         .withCurrentPersonality()
         .withCreatorInfo()
         .withNuclearInfo()
         .withCustomEmoji(availableEmoji)
+        .withChatbotFooter()
         .build();
       const lastMessages: ChatCompletionMessageParam[] = (
         await Promise.all(
