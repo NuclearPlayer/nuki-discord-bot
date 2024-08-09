@@ -91,7 +91,7 @@ export class BotClient extends Client {
                     content = [
                       {
                         type: 'text',
-                        text: content,
+                        text: `[id:${message.author.id}]:${content}`,
                       },
                       {
                         type: 'image_url',
@@ -105,7 +105,7 @@ export class BotClient extends Client {
 
                   return createUserMessage({
                     content,
-                    name: `${serverNickname}[id:${message.author.id}]`,
+                    name: serverNickname,
                   });
                 }),
             )
