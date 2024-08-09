@@ -2,13 +2,10 @@ import { CommandHandler } from './commandHandler';
 import Logger from './logger';
 import { OpenAiApiService } from './open-ai-api-service';
 import { PromptBuilder } from './prompt-builder';
-import { ReplicateService } from './replicate-service';
 import { Client, GatewayIntentBits, Message } from 'discord.js';
-import { isEmpty, random } from 'lodash';
+import { random } from 'lodash';
 import { OpenAI } from 'openai';
 import {
-  ChatCompletionContentPart,
-  ChatCompletionContentPartImage,
   ChatCompletionUserMessageParam,
 } from 'openai/resources';
 
