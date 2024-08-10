@@ -5,12 +5,13 @@ import { PromptBuilder } from '../prompt-builder';
 import { banTool } from '../tools/ban-tool';
 import { doNothingTool } from '../tools/do-nothing';
 import { Client, Message } from 'discord.js';
+import { has } from 'lodash';
 
 export const moderator = {
   execute: async (client: Client, message: Message) => {
     const isNukisMessage = message.author.id === client.user?.id;
 
-    if (isNukisMessage) {
+    if (isNukisMessage || message.system) {
       return;
     }
     const prompt = new PromptBuilder()
@@ -18,9 +19,14 @@ export const moderator = {
       .withCreatorInfo()
       .build();
 
-    const serverNickname = message.guild?.members.cache.get(
-      message.author.id,
-    )?.displayName;
+    const serverNickname = message.guild?.members.cache
+      .get(message.author.id)
+      ?.displayName.replace(/[^a-zA-Z0-9_-]+/g, '');
+
+    // Use sanitizedNickname in your code
+    const channelName = message.channel.isDMBased()
+      ? 'DM'
+      : message.channel.name;
 
     Logger.info('Querying OpenAI API for moderation...');
     const openAiService = new OpenAiApiService();
@@ -31,7 +37,7 @@ export const moderator = {
         { role: 'system', content: prompt },
         {
           role: 'user',
-          content: `[id:${message.author.id}]:${message.content}`,
+          content: `[channel:#${channelName}][id:${message.author.id}]:${message.content}`,
           name: serverNickname,
         },
       ],
@@ -53,9 +59,9 @@ export const moderator = {
           message: message.content,
         });
 
-        // await message.member?.ban({
-        //   deleteMessageSeconds: toolCallBody.deleteMessageSeconds,
-        // });
+        await message.member?.ban({
+          deleteMessageSeconds: toolCallBody.deleteMessageSeconds,
+        });
 
         if (toolCallBody.message) {
           await message.channel.send(toolCallBody.message);
