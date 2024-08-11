@@ -32,7 +32,7 @@ export const moderator = {
     const openAiService = new OpenAiApiService();
     const response = await openAiService.getClient().chat.completions.create({
       max_tokens: 256,
-      model: 'gpt-4o-2024-08-06',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: prompt },
         {
