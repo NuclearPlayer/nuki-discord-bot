@@ -51,9 +51,10 @@ export const chatbot = {
               });
             }
 
-            const serverNickname = message.guild?.members.cache.get(
-              message.author.id,
-            )?.displayName;
+            const serverNickname = (
+              message.guild?.members.cache.get(message.author.id)
+                ?.displayName || ''
+            ).replace(/[^a-zA-Z0-9_-]/g, '');
 
             const image = message.attachments.first()?.url;
 
