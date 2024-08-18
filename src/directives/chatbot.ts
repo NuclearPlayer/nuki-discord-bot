@@ -91,7 +91,7 @@ export const chatbot = {
 
             return createUserMessage({
               content,
-              name: serverNickname,
+              name: serverNickname.length > 0 ? serverNickname : undefined,
             });
           }),
         )
