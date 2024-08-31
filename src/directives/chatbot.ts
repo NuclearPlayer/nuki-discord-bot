@@ -15,7 +15,8 @@ export const chatbot = {
 
     if (
       (chance <= 6 || (client.user && message.mentions.has(client.user))) &&
-      message.author.id !== client.user?.id
+      message.author.id !== client.user?.id &&
+      !message.system
     ) {
       await message.channel.sendTyping();
       const openAiService = new OpenAiApiService();
