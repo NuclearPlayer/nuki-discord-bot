@@ -1,13 +1,10 @@
+import { AIFactory } from '../ai/factory';
 import Logger from '../logger';
-import { OpenAiApiService } from '../open-ai-api-service';
 import { createAssistantMessage, createUserMessage } from '../open-ai-tools';
 import { PromptBuilder } from '../prompt-builder';
+import { CoreMessage, UserContent } from 'ai';
 import { Client, Message } from 'discord.js';
 import { random } from 'lodash';
-import {
-  ChatCompletionContentPart,
-  ChatCompletionMessageParam,
-} from 'openai/resources/chat/completions';
 
 export const chatbot = {
   execute: async (client: Client, message: Message) => {
@@ -19,7 +16,6 @@ export const chatbot = {
       !message.system
     ) {
       await message.channel.sendTyping();
-      const openAiService = new OpenAiApiService();
       const availableEmoji = message.guild?.emojis.cache.map((emoji) => ({
         id: emoji.id,
         name: emoji.name ?? '',
@@ -32,7 +28,7 @@ export const chatbot = {
         .withCustomEmoji(availableEmoji)
         .withChatbotFooter()
         .build();
-      const lastMessages: ChatCompletionMessageParam[] = (
+      const lastMessages: CoreMessage[] = (
         await Promise.all(
           (
             await message.channel.messages.fetch({ limit: 30 })
@@ -48,7 +44,7 @@ export const chatbot = {
                       message.createdTimestamp,
                     ).toLocaleString()}]: ${message.content}`,
                   },
-                ],
+                ] satisfies CoreMessage['content'],
               });
             }
 
@@ -59,7 +55,7 @@ export const chatbot = {
 
             const image = message.attachments.first()?.url;
 
-            let content: ChatCompletionContentPart[] = [
+            let content: CoreMessage['content'] = [
               {
                 type: 'text',
                 text: `[${new Date(
@@ -81,35 +77,32 @@ export const chatbot = {
                   text: `[id:${message.author.id}]:${content}`,
                 },
                 {
-                  type: 'image_url',
-                  image_url: {
-                    detail: 'low',
-                    url: image,
-                  },
+                  type: 'image',
+                  image,
                 },
-              ] as ChatCompletionContentPart[];
+              ] satisfies CoreMessage['content'];
             }
 
             return createUserMessage({
-              content,
+              content: content as UserContent,
               name: serverNickname.length > 0 ? serverNickname : undefined,
             });
           }),
         )
       ).reverse();
 
-      Logger.info('Querying OpenAI API...');
-      const messageToSend = await openAiService
-        .getClient()
-        .chat.completions.create({
-          max_tokens: 256,
-          model: 'gpt-4o-2024-08-06',
-          messages: [{ role: 'system', content: prompt }, ...lastMessages],
-        });
+      Logger.info('Querying AI API...');
+      const aiFactory = AIFactory.getInstance();
+      const response = await aiFactory
+        .getCurrentProvider()
+        .generateResponse([
+          { role: 'system', content: prompt },
+          ...lastMessages,
+        ]);
 
       await message.channel.send(
-        messageToSend.choices[0].message?.content
-          ?.replace('Nuki:', '')
+        response
+          .replace('Nuki:', '')
           .replace('Nuki[id:1087848070512910336]:', '')
           .replace(
             new RegExp(
@@ -117,7 +110,7 @@ export const chatbot = {
               'g',
             ),
             '',
-          )!,
+          ),
       );
     }
   },

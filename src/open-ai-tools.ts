@@ -1,17 +1,30 @@
-import { ChatCompletionAssistantMessageParam, ChatCompletionContentPart, ChatCompletionContentPartText, ChatCompletionUserMessageParam } from 'openai/resources';
+import {
+  AssistantContent,
+  CoreAssistantMessage,
+  CoreMessage,
+  CoreUserMessage,
+  UserContent,
+} from 'ai';
 
-export const createUserMessage = ({content, name}: {content: Array<ChatCompletionContentPart>, name?: string}): ChatCompletionUserMessageParam => {
+export const createUserMessage = ({
+  content,
+}: {
+  content: UserContent;
+  name?: string;
+}): CoreUserMessage => {
   return {
     role: 'user',
-    content, 
-    name
-  }
-}
+    content,
+  };
+};
 
-export const createAssistantMessage = ({content}: {content: Array<ChatCompletionContentPartText>}): ChatCompletionAssistantMessageParam => {
+export const createAssistantMessage = ({
+  content,
+}: {
+  content: AssistantContent;
+}): CoreAssistantMessage => {
   return {
     role: 'assistant',
     content,
-    name: 'Nuki'
-  }
-}
+  };
+};
